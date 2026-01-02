@@ -3,6 +3,10 @@
   "name": "QuickReply Shortcuts",
   "version": "1.0.0",
   "description": "Expand shortcuts like #followup into full replies in Gmail and webmail.",
+  "action": {
+    "default_title": "QuickReply Shortcuts",
+    "default_popup": "options.html"
+  },
   "permissions": ["storage"],
   "options_page": "options.html",
   "content_scripts": [
