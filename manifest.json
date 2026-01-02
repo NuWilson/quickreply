@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "QuickReply Shortcuts",
+  "version": "1.0.0",
+  "description": "Expand shortcuts like #followup into full replies in Gmail and webmail.",
+  "permissions": ["storage"],
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://mail.google.com/*",
+        "*://*.google.com/mail/*",
+        "*://outlook.live.com/*",
+        "*://outlook.office.com/*",
+        "*://*.outlook.com/*",
+        "*://mail.yahoo.com/*",
+        "*://*.proton.me/*",
+        "*://*.zoho.com/*",
+        "*://*.icloud.com/*"
+      ],
+      "js": ["contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
