@@ -33,9 +33,13 @@ function createTemplateRow(template = {}) {
   shortcutInput.type = "text";
   shortcutInput.placeholder = "#followup";
   shortcutInput.value = template.shortcut || "";
+  const shortcutHelper = document.createElement("div");
+  shortcutHelper.className = "helper";
+  shortcutHelper.textContent = "Start with # and avoid spaces.";
 
   shortcutWrapper.appendChild(shortcutLabel);
   shortcutWrapper.appendChild(shortcutInput);
+  shortcutWrapper.appendChild(shortcutHelper);
 
   const contentWrapper = document.createElement("div");
   const contentLabel = document.createElement("label");
@@ -43,9 +47,13 @@ function createTemplateRow(template = {}) {
   const contentInput = document.createElement("textarea");
   contentInput.placeholder = "Full reply to insert";
   contentInput.value = template.content || "";
+  const contentHelper = document.createElement("div");
+  contentHelper.className = "helper";
+  contentHelper.textContent = "Use line breaks to keep paragraphs.";
 
   contentWrapper.appendChild(contentLabel);
   contentWrapper.appendChild(contentInput);
+  contentWrapper.appendChild(contentHelper);
 
   const removeButton = document.createElement("button");
   removeButton.type = "button";
@@ -79,16 +87,62 @@ function collectTemplates() {
     .filter((template) => template.shortcut && template.content);
 }
 
-function setStatus(message) {
+function setStatus(message, isError = false) {
   statusLabel.textContent = message;
+  statusLabel.classList.toggle("error", isError);
   if (message) {
     setTimeout(() => {
       statusLabel.textContent = "";
+      statusLabel.classList.remove("error");
     }, 2000);
   }
 }
 
+function clearValidationState() {
+  templatesContainer.querySelectorAll("input, textarea").forEach((field) => {
+    field.classList.remove("invalid");
+  });
+}
+
+function validateTemplates() {
+  clearValidationState();
+  const rows = Array.from(templatesContainer.querySelectorAll(".template"));
+  const seen = new Set();
+  let isValid = true;
+
+  rows.forEach((row) => {
+    const [shortcutInput, contentInput] = row.querySelectorAll("input, textarea");
+    const shortcut = shortcutInput.value.trim();
+    const content = contentInput.value.trim();
+
+    if (!shortcut || !content) {
+      return;
+    }
+
+    if (!shortcut.startsWith("#") || shortcut.includes(" ")) {
+      shortcutInput.classList.add("invalid");
+      isValid = false;
+      return;
+    }
+
+    if (seen.has(shortcut)) {
+      shortcutInput.classList.add("invalid");
+      isValid = false;
+      return;
+    }
+
+    seen.add(shortcut);
+  });
+
+  return isValid;
+}
+
 async function saveTemplates() {
+  if (!validateTemplates()) {
+    setStatus("Fix highlighted shortcuts before saving.", true);
+    return;
+  }
+
   const templates = collectTemplates();
   await chrome.storage.sync.set({ templates });
   setStatus("Saved!");

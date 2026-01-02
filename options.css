@@ -29,6 +29,11 @@ body {
   max-width: 680px;
 }
 
+.header .subtext {
+  margin-top: 12px;
+  color: #6b7280;
+}
+
 .card {
   background: #fff;
   border-radius: 16px;
@@ -83,6 +88,18 @@ body {
   background: #fff;
 }
 
+.template input.invalid,
+.template textarea.invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+}
+
+.template .helper {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
 .template textarea {
   min-height: 120px;
   resize: vertical;
@@ -127,6 +144,10 @@ body {
 .status {
   color: #10b981;
   font-weight: 600;
+}
+
+.status.error {
+  color: #ef4444;
 }
 
 .hint ol {
