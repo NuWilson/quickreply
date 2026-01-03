@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuickReply Shortcuts</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <h1>QuickReply Shortcuts</h1>
+        <p>
+          Create keyword shortcuts that expand into full email replies. Use a
+          leading # to make them easy to spot while typing.
+        </p>
+        <p class="subtext">
+          Example: set <strong>#reschedule</strong> to expand into a reschedule
+          request template.
+        </p>
+      </header>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Templates</h2>
+          <button id="add-template" class="primary">Add template</button>
+        </div>
+
+        <div id="templates" class="templates"></div>
+
+        <div class="actions">
+          <button id="save" class="primary">Save templates</button>
+          <button id="reset" class="ghost">Reset to defaults</button>
+          <span id="status" class="status" role="status"></span>
+        </div>
+      </section>
+
+      <section class="card hint">
+        <h2>How it works</h2>
+        <ol>
+          <li>Type the shortcut (for example, <strong>#followup</strong>).</li>
+          <li>Press space, tab, or enter.</li>
+          <li>Your full message replaces the shortcut automatically.</li>
+        </ol>
+      </section>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>
