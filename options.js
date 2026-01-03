@@ -1,0 +1,205 @@
+const defaultTemplates = [
+  {
+    shortcut: "#followup",
+    content:
+      "Hi there,\n\nJust following up on my previous note. Let me know if you have any questions or if there's anything else you need from me.\n\nThanks!",
+  },
+  {
+    shortcut: "#status",
+    content:
+      "Hi team,\n\nQuick status update: the current task is in progress and I'm on track to share the next milestone soon. I'll send another update once it's ready.\n\nBest,",
+  },
+  {
+    shortcut: "#intro",
+    content:
+      "Hi [Name],\n\nI'd like to introduce you to [Name]. You both are working on similar projects and I think a quick connection could be helpful.\n\nThanks!",
+  },
+];
+
+const templatesContainer = document.getElementById("templates");
+const addButton = document.getElementById("add-template");
+const saveButton = document.getElementById("save");
+const resetButton = document.getElementById("reset");
+const statusLabel = document.getElementById("status");
+
+async function persistTemplates(templates) {
+  try {
+    await chrome.storage.sync.set({ templates });
+    await chrome.storage.local.remove("templates");
+    return "sync";
+  } catch (error) {
+    await chrome.storage.local.set({ templates });
+    return "local";
+  }
+}
+
+async function getStoredTemplates() {
+  try {
+    const { templates } = await chrome.storage.sync.get("templates");
+    if (Array.isArray(templates) && templates.length) {
+      return templates;
+    }
+  } catch (error) {
+    // Ignore sync failures and fall back to local storage.
+  }
+
+  const { templates: localTemplates } = await chrome.storage.local.get("templates");
+  if (Array.isArray(localTemplates) && localTemplates.length) {
+    return localTemplates;
+  }
+
+  return null;
+}
+
+function createTemplateRow(template = {}) {
+  const row = document.createElement("div");
+  row.className = "template";
+
+  const shortcutWrapper = document.createElement("div");
+  const shortcutLabel = document.createElement("label");
+  shortcutLabel.textContent = "Shortcut";
+  const shortcutInput = document.createElement("input");
+  shortcutInput.type = "text";
+  shortcutInput.placeholder = "#followup";
+  shortcutInput.value = template.shortcut || "";
+  const shortcutHelper = document.createElement("div");
+  shortcutHelper.className = "helper";
+  shortcutHelper.textContent = "Start with # and avoid spaces.";
+
+  shortcutWrapper.appendChild(shortcutLabel);
+  shortcutWrapper.appendChild(shortcutInput);
+  shortcutWrapper.appendChild(shortcutHelper);
+
+  const contentWrapper = document.createElement("div");
+  const contentLabel = document.createElement("label");
+  contentLabel.textContent = "Message";
+  const contentInput = document.createElement("textarea");
+  contentInput.placeholder = "Full reply to insert";
+  contentInput.value = template.content || "";
+  const contentHelper = document.createElement("div");
+  contentHelper.className = "helper";
+  contentHelper.textContent = "Use line breaks to keep paragraphs.";
+
+  contentWrapper.appendChild(contentLabel);
+  contentWrapper.appendChild(contentInput);
+  contentWrapper.appendChild(contentHelper);
+
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.className = "remove";
+  removeButton.textContent = "Remove";
+  removeButton.addEventListener("click", () => row.remove());
+
+  row.appendChild(shortcutWrapper);
+  row.appendChild(contentWrapper);
+  row.appendChild(removeButton);
+
+  return row;
+}
+
+function renderTemplates(templates) {
+  templatesContainer.innerHTML = "";
+  templates.forEach((template) => {
+    templatesContainer.appendChild(createTemplateRow(template));
+  });
+}
+
+function collectTemplates() {
+  return Array.from(templatesContainer.querySelectorAll(".template"))
+    .map((row) => {
+      const [shortcutInput, contentInput] = row.querySelectorAll("input, textarea");
+      return {
+        shortcut: shortcutInput.value.trim(),
+        content: contentInput.value.trim(),
+      };
+    })
+    .filter((template) => template.shortcut && template.content);
+}
+
+function setStatus(message, isError = false) {
+  statusLabel.textContent = message;
+  statusLabel.classList.toggle("error", isError);
+  if (message) {
+    setTimeout(() => {
+      statusLabel.textContent = "";
+      statusLabel.classList.remove("error");
+    }, 2000);
+  }
+}
+
+function clearValidationState() {
+  templatesContainer.querySelectorAll("input, textarea").forEach((field) => {
+    field.classList.remove("invalid");
+  });
+}
+
+function validateTemplates() {
+  clearValidationState();
+  const rows = Array.from(templatesContainer.querySelectorAll(".template"));
+  const seen = new Set();
+  let isValid = true;
+
+  rows.forEach((row) => {
+    const [shortcutInput, contentInput] = row.querySelectorAll("input, textarea");
+    const shortcut = shortcutInput.value.trim();
+    const content = contentInput.value.trim();
+
+    if (!shortcut || !content) {
+      return;
+    }
+
+    if (!shortcut.startsWith("#") || shortcut.includes(" ")) {
+      shortcutInput.classList.add("invalid");
+      isValid = false;
+      return;
+    }
+
+    if (seen.has(shortcut)) {
+      shortcutInput.classList.add("invalid");
+      isValid = false;
+      return;
+    }
+
+    seen.add(shortcut);
+  });
+
+  return isValid;
+}
+
+async function saveTemplates() {
+  if (!validateTemplates()) {
+    setStatus("Fix highlighted shortcuts before saving.", true);
+    return;
+  }
+
+  const templates = collectTemplates();
+  const destination = await persistTemplates(templates);
+  setStatus(destination === "sync" ? "Saved!" : "Saved locally (sync unavailable).");
+}
+
+async function loadTemplates() {
+  const templates = await getStoredTemplates();
+  if (!Array.isArray(templates) || templates.length === 0) {
+    await persistTemplates(defaultTemplates);
+    renderTemplates(defaultTemplates);
+    return;
+  }
+
+  renderTemplates(templates);
+}
+
+addButton.addEventListener("click", () => {
+  templatesContainer.appendChild(createTemplateRow());
+});
+
+saveButton.addEventListener("click", saveTemplates);
+
+resetButton.addEventListener("click", async () => {
+  const destination = await persistTemplates(defaultTemplates);
+  renderTemplates(defaultTemplates);
+  setStatus(
+    destination === "sync" ? "Defaults restored" : "Defaults restored locally.",
+  );
+});
+
+loadTemplates();

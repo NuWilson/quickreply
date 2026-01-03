@@ -1,0 +1,168 @@
+:root {
+  color-scheme: light;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: #f5f6fb;
+  color: #1f2937;
+}
+
+body {
+  margin: 0;
+  padding: 32px;
+}
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+}
+
+.header p {
+  margin: 0;
+  color: #4b5563;
+  max-width: 680px;
+}
+
+.header .subtext {
+  margin-top: 12px;
+  color: #6b7280;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.templates {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.template {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: 16px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.template label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.template input,
+.template textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.template input.invalid,
+.template textarea.invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+}
+
+.template .helper {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+.template textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.template .remove {
+  align-self: center;
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.primary {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghost {
+  background: #fff;
+  border: 1px solid #cbd5f5;
+  padding: 10px 18px;
+  border-radius: 999px;
+  color: #4338ca;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.status.error {
+  color: #ef4444;
+}
+
+.hint ol {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  color: #4b5563;
+}
+
+@media (max-width: 720px) {
+  .template {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
